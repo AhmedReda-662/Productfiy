@@ -3,6 +3,10 @@ import { ENV } from "./config/env";
 import { clerkMiddleware } from "@clerk/express";
 import cors from "cors";
 
+import userRoute from "./routes/userRoutes";
+import productRoute from "./routes/productRoutes";
+import commentRoute from "./routes/commentesRoutes";
+
 const app = express();
 
 app.use(clerkMiddleware());
@@ -20,6 +24,10 @@ app.get("/", (req, res) => {
     },
   });
 });
+
+app.use("/api/users", userRoute);
+app.use("/api/products", productRoute);
+app.use("/api/comments", commentRoute);
 
 app.listen(ENV.PORT, () => {
   console.log("Server is running on http://localhost:3000");
