@@ -1,22 +1,26 @@
 import express from "express";
+import cors from "cors";
+import path from "path";
+
 import { ENV } from "./config/env";
 import { clerkMiddleware } from "@clerk/express";
-import cors from "cors";
 
-import userRoute from "./routes/userRoutes";
-import productRoute from "./routes/productRoutes";
-import commentRoute from "./routes/commentesRoutes";
+import userRoutes from "./routes/userRoutes";
+import productRoutes from "./routes/productRoutes";
+import commentRoutes from "./routes/commentesRoutes";
 
 const app = express();
 
-app.use(clerkMiddleware());
 app.use(cors({ origin: ENV.FRONTEND_URL, credentials: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.get("/", (req, res) => {
+// `credentials: true` allows the frontend to send cookies to the backend so that we can authenticate the user.
+app.use(clerkMiddleware()); // auth obj will be attached to the req
+app.use(express.json()); // parses JSON request bodies.
+app.use(express.urlencoded({ extended: true })); // parses form data (like HTML forms).
+
+app.get("/api/health", (req, res) => {
   res.json({
     message:
-      "Welcome to Productify API - Powered by PostgresSQL, Drizzle ORM & Clerk Auth",
+      "Welcome to Productify API - Powered by PostgreSQL, Drizzle ORM & Clerk Auth",
     endpoints: {
       users: "/api/users",
       products: "/api/products",
@@ -25,10 +29,22 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/users", userRoute);
-app.use("/api/products", productRoute);
-app.use("/api/comments", commentRoute);
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/comments", commentRoutes);
 
-app.listen(ENV.PORT, () => {
-  console.log("Server is running on http://localhost:3000");
-});
+if (ENV.NODE_ENV === "production") {
+  const __dirname = path.resolve();
+
+  // serve static files from frontend/dist
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  // handle SPA routing - send all non-API routes to index.html - react app
+  app.get("/{*any}", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  });
+}
+
+const server = app.listen(ENV.PORT, () =>
+  console.log("Server is up and running on PORT:", ENV.PORT)
+);
