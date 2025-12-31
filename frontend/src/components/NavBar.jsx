@@ -22,7 +22,6 @@ export default function NavBar() {
           </Link>
         </div>
         <div className="flex gap-2 items-center">
-          <ThemeSelector />
           {isSignedIn ? (
             <>
               <ThemeSelector />
