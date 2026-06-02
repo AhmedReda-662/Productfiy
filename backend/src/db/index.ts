@@ -3,6 +3,8 @@ import { Pool } from "pg";
 import * as schema from "./schema";
 import { ENV } from "../config/env";
 
+console.log(ENV.DB_URL);
+
 if (!ENV.DB_URL) {
   throw new Error("DB_URL is not defined in environment variables");
 }

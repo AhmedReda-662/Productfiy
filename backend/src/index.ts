@@ -35,16 +35,15 @@ app.use("/api/comments", commentRoutes);
 
 if (ENV.NODE_ENV === "production") {
   const __dirname = path.resolve();
-
-  // serve static files from frontend/dist
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  // serve static files from /dist
+  app.use(express.static(path.join(__dirname, "./dist")));
 
   // handle SPA routing - send all non-API routes to index.html - react app
   app.get("/{*any}", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+    res.sendFile(path.join(__dirname, "./dist/index.html"));
   });
 }
 
 const server = app.listen(ENV.PORT, () =>
-  console.log("Server is up and running on PORT:", ENV.PORT)
+  console.log("Server is up and running on PORT:", ENV.PORT),
 );
